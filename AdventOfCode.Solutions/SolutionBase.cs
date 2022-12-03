@@ -97,6 +97,7 @@ public abstract class SolutionBase
         try
         {
             var input = AdventOfCodeService.FetchInput(Year, Day).Result;
+            Directory.CreateDirectory(Path.GetDirectoryName(inputFilepath));
             File.WriteAllText(inputFilepath, input);
             return input;
         }
