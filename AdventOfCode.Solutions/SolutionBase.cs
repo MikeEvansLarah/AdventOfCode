@@ -6,6 +6,7 @@ global using System.Text;
 global using AdventOfCode.Solutions.Utils;
 
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using AdventOfCode.Services;
 
@@ -17,11 +18,8 @@ public abstract class SolutionBase
     public int Year { get; }
     public string Title { get; }
     public bool Debug { get; set; }
-    public string Input { get; }
-    public string DebugInput { get; }
-
-    public SolutionResult Part1 => Solve(1);
-    public SolutionResult Part2 => Solve(2);
+    public string? Input { get; private set; }
+    public string? DebugInput { get; private set; }
 
     private protected SolutionBase(int day, int year, string title, bool useDebugInput = false)
     {
@@ -29,26 +27,29 @@ public abstract class SolutionBase
         Year = year;
         Title = title;
         Debug = useDebugInput;
+    }
 
+    public SolutionResult LoadAndSolve()
+    {
+        var sw = Stopwatch.StartNew();
         Input = LoadInput(Debug);
         DebugInput = LoadInput(true);
+        sw.Stop();
+
+        SolutionResult result = new(Day, Year, Title, Debug, sw.Elapsed, SolvePart(1), SolvePart(2));
+
+        return result;
     }
 
-    public IEnumerable<SolutionResult> SolveAll()
+    SolutionPartResult SolvePart(int part = 1)
     {
-        yield return Solve(SolvePartOne);
-        yield return Solve(SolvePartTwo);
-    }
-
-    public SolutionResult Solve(int part = 1)
-    {
-        if (part == 1) return Solve(SolvePartOne);
-        if (part == 2) return Solve(SolvePartTwo);
+        if (part == 1) return SolvePart(part, SolvePartOne);
+        if (part == 2) return SolvePart(part, SolvePartTwo);
 
         throw new InvalidOperationException("Invalid part param supplied.");
     }
 
-    SolutionResult Solve(Func<string> SolverFunction)
+    SolutionPartResult SolvePart(int part, Func<string> SolverFunction)
     {
         if (Debug)
         {
@@ -68,15 +69,15 @@ public abstract class SolutionBase
             var result = SolverFunction();
             sw.Stop();
             return string.IsNullOrEmpty(result)
-                ? SolutionResult.Empty
-                : new SolutionResult { Answer = result, Time = sw.Elapsed };
+                ? SolutionPartResult.Empty
+                : new SolutionPartResult(part, result, sw.Elapsed);
         }
         catch (Exception)
         {
             if (Debugger.IsAttached)
             {
                 Debugger.Break();
-                return SolutionResult.Empty;
+                return SolutionPartResult.Empty;
             }
             else
             {
@@ -100,7 +101,7 @@ public abstract class SolutionBase
         try
         {
             var input = AdventOfCodeService.FetchInput(Year, Day).Result;
-            Directory.CreateDirectory(Path.GetDirectoryName(inputFilepath));
+            Directory.CreateDirectory(Path.GetDirectoryName(inputFilepath)!);
             File.WriteAllText(inputFilepath, input);
             return input;
         }
@@ -136,24 +137,55 @@ public abstract class SolutionBase
         return "";
     }
 
-    public override string ToString() =>
-        $"\n--- Day {Day}: {Title} --- {(Debug ? "!! Debug mode active, using DebugInput !!" : "")}\n"
-        + $"{ResultToString(1, Part1)}\n"
-        + $"{ResultToString(2, Part2)}";
-
-    static string ResultToString(int part, SolutionResult result) =>
-        $"  - Part{part} => " + (string.IsNullOrEmpty(result.Answer) 
-            ? "Unsolved"
-            : $"{result.Answer} ({result.Time.TotalMilliseconds}ms)");
-
     protected abstract string SolvePartOne();
     protected abstract string SolvePartTwo();
 }
 
-public struct SolutionResult
+public readonly struct SolutionPartResult
 {
-    public string Answer { get; set; }
-    public TimeSpan Time { get; set; }
+    public SolutionPartResult(int part, string answer, TimeSpan time)
+    {
+        Part = part;
+        Answer = answer;
+        Time = time;
+    }
 
-    public static SolutionResult Empty => new();
+    public int Part { get; }
+    public string Answer { get; }
+    public TimeSpan Time { get; }
+
+    public static SolutionPartResult Empty => new();
+
+    public override string ToString() =>
+        $"  - Part{Part} => " + (string.IsNullOrEmpty(Answer)
+            ? "Unsolved"
+            : $"{Answer} ({Time.TotalMilliseconds}ms)");
+}
+
+public readonly struct SolutionResult
+{
+    public SolutionResult(int day, int year, string title, bool debug, TimeSpan inputLoadingTime, SolutionPartResult partOneResult, SolutionPartResult partTwoResult)
+    {
+        Day = day;
+        Year = year;
+        Title = title;
+        Debug = debug;
+        InputLoadingTime = inputLoadingTime;
+        PartOneResult = partOneResult;
+        PartTwoResult = partTwoResult;
+    }
+
+    public int Day { get; }
+    public int Year { get; }
+    public string Title { get; }
+    public bool Debug { get; }
+    public TimeSpan InputLoadingTime { get; }
+    public SolutionPartResult PartOneResult { get; }
+    public SolutionPartResult PartTwoResult { get; }
+
+    public override string ToString() =>
+        $"\n--- Day {Day}: {Title} --- {(Debug ? "!! Debug mode active, using DebugInput !!" : "")}\n"
+        + $"  - Input loading... ({InputLoadingTime.TotalMilliseconds}ms)\n"
+        + $"{PartOneResult}\n"
+        + $"{PartTwoResult}";
 }
