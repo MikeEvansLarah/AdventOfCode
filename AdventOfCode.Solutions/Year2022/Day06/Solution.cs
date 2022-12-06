@@ -4,13 +4,32 @@ class Solution : SolutionBase
 {
     public Solution() : base(06, 2022, "") { }
 
+    private string FindMarkerIndex(int numDistinctCharacters)
+    {
+        for (int i = numDistinctCharacters; i < Input.Length; i++)
+        {
+            string block = this.Input[(i - numDistinctCharacters)..i];
+
+            if (block.Distinct().Count() == block.Length)
+            {
+                return i.ToString();
+            }
+        }
+
+        throw new Exception("Marker not found.");
+    }
+
     protected override string SolvePartOne()
     {
-        return "";
+        const int numDistinctCharacters = 4;
+
+        return FindMarkerIndex(numDistinctCharacters);
     }
 
     protected override string SolvePartTwo()
     {
-        return "";
+        const int numDistinctCharacters = 14;
+
+        return FindMarkerIndex(numDistinctCharacters);
     }
 }
