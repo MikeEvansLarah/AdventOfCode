@@ -17,8 +17,8 @@ public abstract class SolutionBase
     public int Year { get; }
     public string Title { get; }
     public bool Debug { get; set; }
-    public string Input => LoadInput(Debug);
-    public string DebugInput => LoadInput(true);
+    public string Input { get; }
+    public string DebugInput { get; }
 
     public SolutionResult Part1 => Solve(1);
     public SolutionResult Part2 => Solve(2);
@@ -29,6 +29,9 @@ public abstract class SolutionBase
         Year = year;
         Title = title;
         Debug = useDebugInput;
+
+        Input = LoadInput(Debug);
+        DebugInput = LoadInput(true);
     }
 
     public IEnumerable<SolutionResult> SolveAll()
@@ -61,12 +64,12 @@ public abstract class SolutionBase
 
         try
         {
-            var then = DateTime.Now;
+            var sw = Stopwatch.StartNew();
             var result = SolverFunction();
-            var now = DateTime.Now;
+            sw.Stop();
             return string.IsNullOrEmpty(result)
                 ? SolutionResult.Empty
-                : new SolutionResult { Answer = result, Time = now - then };
+                : new SolutionResult { Answer = result, Time = sw.Elapsed };
         }
         catch (Exception)
         {
@@ -138,7 +141,7 @@ public abstract class SolutionBase
         + $"{ResultToString(1, Part1)}\n"
         + $"{ResultToString(2, Part2)}";
 
-    string ResultToString(int part, SolutionResult result) =>
+    static string ResultToString(int part, SolutionResult result) =>
         $"  - Part{part} => " + (string.IsNullOrEmpty(result.Answer) 
             ? "Unsolved"
             : $"{result.Answer} ({result.Time.TotalMilliseconds}ms)");
@@ -152,5 +155,5 @@ public struct SolutionResult
     public string Answer { get; set; }
     public TimeSpan Time { get; set; }
 
-    public static SolutionResult Empty => new SolutionResult();
+    public static SolutionResult Empty => new();
 }
