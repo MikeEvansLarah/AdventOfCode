@@ -20,7 +20,7 @@ class Solution : SolutionBase
 
         public int? Size { get; set; }
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         public ItemType Type { get; set; }
 
@@ -78,7 +78,7 @@ class Solution : SolutionBase
                 else if (line[0..3] == "dir")
                 {
                     var directoryName = line[4..];
-                    currentItem.Children.Add(directoryName, new Item
+                    currentItem!.Children.Add(directoryName, new Item
                     {
                         Name = directoryName,
                         Type = ItemType.Directory,
@@ -90,7 +90,7 @@ class Solution : SolutionBase
                     var size = int.Parse(line.Split(' ')[0]);
                     var fileName = line.Split(' ')[1];
 
-                    currentItem.Children.Add(fileName, new Item
+                    currentItem!.Children.Add(fileName, new Item
                     {
                         Name = fileName,
                         Type = ItemType.File,
@@ -106,7 +106,7 @@ class Solution : SolutionBase
 
     protected override string SolvePartOne()
     {
-        var fs = FileSystem.Parse(this.Input);
+        var fs = FileSystem.Parse(this.Input!);
 
         var flat = fs.Root.Flatten()
             .Where(x => x.Type == ItemType.Directory).ToList();
@@ -119,7 +119,7 @@ class Solution : SolutionBase
 
     protected override string SolvePartTwo()
     {
-        var fs = FileSystem.Parse(this.Input);
+        var fs = FileSystem.Parse(this.Input!);
 
         var unusedSpace = 70000000 - fs.Root.TotalSize;
         var minDeletionSize = 30000000 - unusedSpace;
@@ -127,7 +127,7 @@ class Solution : SolutionBase
         var flat = fs.Root.Flatten()
             .Where(x => x.Type == ItemType.Directory).ToList();
 
-        var result = flat.Where(x => x.TotalSize >= minDeletionSize).MinBy(x => x.TotalSize).TotalSize;
+        var result = flat.Where(x => x.TotalSize >= minDeletionSize).MinBy(x => x.TotalSize)!.TotalSize;
 
         return result.ToString();
     }

@@ -62,7 +62,7 @@ class Solution : SolutionBase
 
     protected override string SolvePartOne()
     {
-        var rucksacks = this.Input.SplitByNewline().Select(
+        var rucksacks = this.Input!.SplitByNewline().Select(
             x => new Rucksack(x)
         ).ToList();
 
@@ -73,7 +73,7 @@ class Solution : SolutionBase
 
     protected override string SolvePartTwo()
     {
-        var rucksacks = this.Input.SplitByNewline().Select(
+        var rucksacks = this.Input!.SplitByNewline().Select(
             x => new Rucksack(x)
         ).ToList();
 

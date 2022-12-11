@@ -60,7 +60,7 @@ partial class Solution : SolutionBase
 
     public Ship Parse()
     {
-        string[] paragraphs = Input.SplitByParagraph();
+        string[] paragraphs = Input!.SplitByParagraph().ToArray();
         string drawingPara = paragraphs[0];
         string instructionsPara = paragraphs[1];
 

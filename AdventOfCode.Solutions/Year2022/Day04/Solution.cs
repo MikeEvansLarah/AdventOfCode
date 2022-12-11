@@ -47,7 +47,7 @@ class Solution : SolutionBase
 
     private List<Pair> ParsePairs()
     {
-        return this.Input
+        return this.Input!
                     .SplitByNewline()
                     .Select(x =>
                     {

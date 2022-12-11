@@ -14,11 +14,10 @@ public static class StringUtils
         .Where(s => !string.IsNullOrWhiteSpace(s))
         .Select(s => shouldTrim ? s.Trim() : s);
 
-    public static string[] SplitByParagraph(this string str, bool shouldTrim = false) => str
+    public static IEnumerable<string> SplitByParagraph(this string str, bool shouldTrim = false) => str
         .Split(new[] { "\r\r", "\n\n", "\r\n\r\n" }, StringSplitOptions.None)
         .Where(s => !string.IsNullOrWhiteSpace(s))
-        .Select(s => shouldTrim ? s.Trim() : s)
-        .ToArray();
+        .Select(s => shouldTrim ? s.Trim() : s);
 
     public static int[] ToIntArray(this string str, string delimiter = "")
     {

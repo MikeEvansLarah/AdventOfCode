@@ -6,7 +6,7 @@ class Solution : SolutionBase
 
     private string FindMarkerIndex(int numDistinctCharacters)
     {
-        for (int i = numDistinctCharacters; i < Input.Length; i++)
+        for (int i = numDistinctCharacters; i < Input!.Length; i++)
         {
             string block = this.Input[(i - numDistinctCharacters)..i];
 

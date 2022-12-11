@@ -30,9 +30,9 @@ class Solution : SolutionBase
     {
         IEnumerable<Elf> elves = ParseElves();
 
-        Elf elfCarryingMostCalories = elves.MaxBy(e => e.TotalCalories);
+        Elf? elfCarryingMostCalories = elves.MaxBy(e => e.TotalCalories);
 
-        return elfCarryingMostCalories.TotalCalories.ToString();
+        return elfCarryingMostCalories?.TotalCalories.ToString() ?? "";
     }
 
     protected override string SolvePartTwo()
@@ -46,7 +46,7 @@ class Solution : SolutionBase
 
     private IEnumerable<Elf> ParseElves()
     {
-        return this.Input
+        return this.Input!
             .SplitByParagraph()
             .Select(p =>
             {
