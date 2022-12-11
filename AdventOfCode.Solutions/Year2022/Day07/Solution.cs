@@ -67,11 +67,11 @@ class Solution : SolutionBase
 
                         if (moveTo == "..")
                         {
-                            currentItem = currentItem.Parent;
+                            currentItem = currentItem!.Parent;
                         }
                         else
                         {
-                            currentItem = currentItem.Children[moveTo];
+                            currentItem = currentItem!.Children[moveTo];
                         }
                     }
                 }

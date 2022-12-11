@@ -55,6 +55,7 @@ class Solution : SolutionBase
                 { Outcome: Outcome.Lose, OpponentHandShape: HandShape.Rock } => HandShape.Scissors,
                 { Outcome: Outcome.Lose, OpponentHandShape: HandShape.Paper } => HandShape.Rock,
                 { Outcome: Outcome.Lose, OpponentHandShape: HandShape.Scissors } => HandShape.Paper,
+                _ => throw new NotImplementedException(),
             };
         }
 
@@ -69,7 +70,7 @@ class Solution : SolutionBase
 
     private IEnumerable<Round> Parse1()
     {
-        var rounds = this.Input
+        var rounds = this.Input!
             .SplitByNewline()
             .Select(
                 x =>

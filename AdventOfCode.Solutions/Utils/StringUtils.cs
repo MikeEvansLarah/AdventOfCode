@@ -9,11 +9,10 @@ public static class StringUtils
         return new string(arr);
     }
 
-    public static string[] SplitByNewline(this string str, bool shouldTrim = false) => str
+    public static IEnumerable<string> SplitByNewline(this string str, bool shouldTrim = false) => str
         .Split(new[] { "\r", "\n", "\r\n" }, StringSplitOptions.None)
         .Where(s => !string.IsNullOrWhiteSpace(s))
-        .Select(s => shouldTrim ? s.Trim() : s)
-        .ToArray();
+        .Select(s => shouldTrim ? s.Trim() : s);
 
     public static string[] SplitByParagraph(this string str, bool shouldTrim = false) => str
         .Split(new[] { "\r\r", "\n\n", "\r\n\r\n" }, StringSplitOptions.None)

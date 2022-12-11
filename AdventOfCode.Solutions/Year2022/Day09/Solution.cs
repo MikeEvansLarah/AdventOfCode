@@ -66,7 +66,7 @@ class Solution : SolutionBase
         var tailPosition = (x:0, y:0);
         visitedPositions.Add(tailPosition);
 
-        string[] lines = this.Input.SplitByNewline();
+        string[] lines = this.Input!.SplitByNewline().ToArray();
         for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
         {
             string? line = lines[lineIndex];
@@ -94,7 +94,7 @@ class Solution : SolutionBase
         
         visitedPositions.Add(tailPositions[^1]);
 
-        string[] lines = this.Input.SplitByNewline();
+        string[] lines = this.Input!.SplitByNewline().ToArray();
         for (int lineIndex = 0; lineIndex < lines.Length; lineIndex++)
         {
             string? line = lines[lineIndex];

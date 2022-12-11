@@ -118,7 +118,7 @@ class Solution : SolutionBase
 
     private int[,] ParseGrid()
     {
-        var splitLines = this.Input!.SplitByNewline();
+        var splitLines = this.Input!.SplitByNewline().ToArray();
         int[,] grid = new int[splitLines.Length, splitLines[0].Length];
 
         for (int row = 0; row < splitLines.Length; row++)
