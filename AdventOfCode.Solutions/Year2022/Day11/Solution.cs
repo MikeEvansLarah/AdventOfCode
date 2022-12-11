@@ -89,12 +89,8 @@ class Solution : SolutionBase
             }).ToList();
     }
 
-    public static IList<Monkey> ProcessRound(IList<Monkey> monkeys, bool divideByThree = true)
+    public static IList<Monkey> ProcessRound(IList<Monkey> monkeys, bool divideByThree = true, int? lcm = null)
     {
-        var lcm = monkeys
-            .Select(m => m.TestDivisor)
-            .Aggregate((a, b) => CalculationUtils.FindLCM(a, b));
-
         foreach (var monkey in monkeys)
         {
             while (monkey.Items.TryDequeue(out var item))
@@ -102,7 +98,7 @@ class Solution : SolutionBase
                 item.WorryLevel = monkey.Operation(item.WorryLevel);
 
                 if (divideByThree) item.WorryLevel /= 3;
-                else item.WorryLevel %= lcm;
+                if (lcm.HasValue) item.WorryLevel %= lcm.Value;
 
                 monkey.ItemsInspected++;
 
@@ -137,9 +133,13 @@ class Solution : SolutionBase
     protected override string SolvePartTwo()
     {
         var monkeys = this.Parse();
+        var lcm = monkeys
+            .Select(m => m.TestDivisor)
+            .Aggregate(CalculationUtils.FindLCM);
+
         for (int i = 0; i < 10000; i++)
         {
-            monkeys = ProcessRound(monkeys, false);
+            monkeys = ProcessRound(monkeys, false, lcm);
         }
 
         return monkeys
