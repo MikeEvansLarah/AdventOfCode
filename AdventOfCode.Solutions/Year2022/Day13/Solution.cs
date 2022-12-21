@@ -1,6 +1,3 @@
-using System.Text.Json;
-using static AdventOfCode.Solutions.Year2022.Day13.Solution;
-
 namespace AdventOfCode.Solutions.Year2022.Day13;
 
 class Solution : SolutionBase
@@ -118,7 +115,7 @@ class Solution : SolutionBase
                         packets.Add(new Packet { Integer = value });
                     }
 
-                    return (new Packet { List = packets }, i + 1);
+                    return (new Packet { List = packets }, i);
                 }
                 else if (c == ',')
                 {
