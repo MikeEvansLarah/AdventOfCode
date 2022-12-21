@@ -53,7 +53,7 @@ class Solution : SolutionBase
             AnsiConsole.Markup(sb.ToString());
         }
 
-        public void DropUnitOfSand(out bool isFull)
+        public void DropUnitOfSand(out bool isFull, bool draw = false)
         {
             (int sandX, int sandY) = (500, 0);
 
@@ -61,7 +61,6 @@ class Solution : SolutionBase
 
             do
             {
-
                 if (map[sandX, sandY] == Material.Sand)
                 {
                     isFull = true;
@@ -102,6 +101,13 @@ class Solution : SolutionBase
             while (canMove);
 
             map[sandX, sandY] = Material.Sand;
+
+            if (draw)
+            {
+                AnsiConsole.Cursor.SetPosition(sandX - minX/2, sandY + 1);
+                AnsiConsole.Markup(Emoji.Known.BrownSquare);
+                Thread.Sleep(TimeSpan.FromTicks(100));
+            }
 
             return;
         }
@@ -223,18 +229,18 @@ class Solution : SolutionBase
     {
         var cave = Cave.Parse(this.Input!, true);
 
+        Console.Clear();
+        Console.CursorVisible = false;
+        cave.Draw();
+
         bool isFull = false;
         int units = 0;
 
         while (!isFull)
         {
-            cave.DropUnitOfSand(out isFull);
+            cave.DropUnitOfSand(out isFull, true);
             if (!isFull) units++;
         }
-
-        Console.Clear();
-        cave.Draw();
-        Console.WriteLine();
 
         return units.ToString();
     }

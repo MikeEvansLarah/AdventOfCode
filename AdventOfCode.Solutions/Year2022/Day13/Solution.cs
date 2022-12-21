@@ -28,22 +28,12 @@ class Solution : SolutionBase
                 Packet.Parse(lines[1])
             );
         }
-    }
 
-    public class Packet
-    {
-        public List<Packet> List { get; set; } = new();
-
-        public int? Integer { get; set; }
-
-        public static Packet Parse(string input)
+        public bool? OrderedCorrectly()
         {
-            var (packet, _) = ParseInternal(input);
-            return packet;
-        }
+            var left = Packet1;
+            var right = Packet2;
 
-        public static bool? OrderedCorrectly(Packet left, Packet right)
-        {
             if (left.Integer.HasValue && right.Integer.HasValue)
             {
                 if (left.Integer.Value < right.Integer.Value)
@@ -67,30 +57,42 @@ class Solution : SolutionBase
                     if (left.List.Count < i + 1 && right.List.Count >= i + 1) return true;
                     if (right.List.Count < i + 1 && left.List.Count >= i + 1) return false;
 
-                    var ordered = OrderedCorrectly(left.List[i], right.List[i]);
+                    var pair = new Pair(left.List[i], right.List[i]);
+                    var ordered = pair.OrderedCorrectly();
 
                     if (ordered.HasValue)
                     {
                         return ordered;
-                    }
-                    else
-                    {
-                        continue;
                     }
                 }
             }
 
             else if (left.Integer.HasValue)
             {
-                return OrderedCorrectly(new Packet { List = new List<Packet> { left } }, right);
+                var pair = new Pair(new Packet { List = new List<Packet> { left } }, right);
+                return pair.OrderedCorrectly();
             }
 
             else if (right.Integer.HasValue)
             {
-                return OrderedCorrectly(left, new Packet { List = new List<Packet> { right } });
+                var pair = new Pair(left, new Packet { List = new List<Packet> { right } });
+                return pair.OrderedCorrectly();
             }
 
             return null;
+        }
+    }
+
+    public class Packet
+    {
+        public List<Packet> List { get; set; } = new();
+
+        public int? Integer { get; set; }
+
+        public static Packet Parse(string input)
+        {
+            var (packet, _) = ParseInternal(input);
+            return packet;
         }
 
         private static (Packet packet, int increment) ParseInternal(string input)
@@ -141,18 +143,18 @@ class Solution : SolutionBase
     protected override string SolvePartOne()
     {
         var pairs = this.Input!.SplitByParagraph()
-            .Select(
-                x => x.SplitByNewline().Select(Packet.Parse).ToList())
+            .Select(Pair.Parse)
             .ToList();
 
         int result = 0;
         for (int i = 0; i < pairs.Count; i++)
         {
             var pair = pairs[i];
-            var orderedCorrectly = Packet.OrderedCorrectly(pair[0], pair[1]);
+            var orderedCorrectly = pair.OrderedCorrectly();
 
             if (orderedCorrectly.HasValue && orderedCorrectly.Value)
             {
+                Console.WriteLine(i + 1);
                 result += (i + 1);
             }
         }
