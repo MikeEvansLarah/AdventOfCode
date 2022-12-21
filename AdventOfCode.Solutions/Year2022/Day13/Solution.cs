@@ -26,24 +26,29 @@ class Solution : SolutionBase
             );
         }
 
-        public bool? OrderedCorrectly()
+        public bool OrderedCorrectly()
         {
             var left = Packet1;
             var right = Packet2;
 
+            return Compare(left, right) < 0;
+        }
+
+        public static int Compare(Packet left, Packet right)
+        {
             if (left.Integer.HasValue && right.Integer.HasValue)
             {
                 if (left.Integer.Value < right.Integer.Value)
                 {
-                    return true;
+                    return -1;
                 }
                 else if (left.Integer.Value > right.Integer.Value)
                 {
-                    return false;
+                    return 1;
                 }
                 else
                 {
-                    return null;
+                    return 0;
                 }
             }
 
@@ -51,13 +56,12 @@ class Solution : SolutionBase
             {
                 for (int i = 0; i < Math.Max(left.List.Count, right.List.Count); i++)
                 {
-                    if (left.List.Count < i + 1 && right.List.Count >= i + 1) return true;
-                    if (right.List.Count < i + 1 && left.List.Count >= i + 1) return false;
+                    if (left.List.Count < i + 1 && right.List.Count >= i + 1) return -1;
+                    if (right.List.Count < i + 1 && left.List.Count >= i + 1) return 1;
 
-                    var pair = new Pair(left.List[i], right.List[i]);
-                    var ordered = pair.OrderedCorrectly();
+                    var ordered = Compare(left.List[i], right.List[i]);
 
-                    if (ordered.HasValue)
+                    if (ordered != 0)
                     {
                         return ordered;
                     }
@@ -66,17 +70,15 @@ class Solution : SolutionBase
 
             else if (left.Integer.HasValue)
             {
-                var pair = new Pair(new Packet { List = new List<Packet> { left } }, right);
-                return pair.OrderedCorrectly();
+                return Compare(new Packet { List = new List<Packet> { left } }, right);
             }
 
             else if (right.Integer.HasValue)
             {
-                var pair = new Pair(left, new Packet { List = new List<Packet> { right } });
-                return pair.OrderedCorrectly();
+                return Compare(left, new Packet { List = new List<Packet> { right } });
             }
 
-            return null;
+            return 0;
         }
     }
 
@@ -86,9 +88,17 @@ class Solution : SolutionBase
 
         public int? Integer { get; set; }
 
+        public bool IsDivider { get; set; }
+
         public static Packet Parse(string input)
         {
             var (packet, _) = ParseInternal(input);
+
+            if (input == "[[2]]" || input == "[[6]]")
+            {
+                packet.IsDivider = true;
+            }
+
             return packet;
         }
 
@@ -149,9 +159,8 @@ class Solution : SolutionBase
             var pair = pairs[i];
             var orderedCorrectly = pair.OrderedCorrectly();
 
-            if (orderedCorrectly.HasValue && orderedCorrectly.Value)
+            if (orderedCorrectly)
             {
-                Console.WriteLine(i + 1);
                 result += (i + 1);
             }
         }
@@ -161,6 +170,16 @@ class Solution : SolutionBase
 
     protected override string SolvePartTwo()
     {
-        return "";
+        var packets = this.Input!.SplitByNewline(true).Select(Packet.Parse).ToList();
+        packets.Add(Packet.Parse("[[2]]"));
+        packets.Add(Packet.Parse("[[6]]"));
+
+        var sorted = packets.BubbleSort(Pair.Compare);
+
+        var result = sorted.Select((value, i) => new { value, index = i + 1 })
+            .Where(pair => pair.value.IsDivider)
+            .Aggregate(1, (acc, pair) => pair.index * acc);
+
+        return result.ToString();
     }
 }
